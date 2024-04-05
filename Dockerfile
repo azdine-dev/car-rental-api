@@ -17,7 +17,7 @@ FROM openjdk:17.0.1-jdk-slim
 WORKDIR /app
 
 # Copy the JAR file built in the previous stage to the container
-COPY --from=build /app/target/your-application.jar ./app.jar
+COPY --from=build /app/target/car-rental-0.0.1-SNAPSHOT.jar ./app.jar
 
 # Expose the port on which your Spring Boot app will run (change as needed)
 EXPOSE 8080
