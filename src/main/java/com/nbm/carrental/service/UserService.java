@@ -1,42 +1,35 @@
 package com.nbm.carrental.service;
 
+import com.nbm.carrental.dto.AgencySignupRequest;
+import com.nbm.carrental.dto.JwtAuthenticationResponse;
+import com.nbm.carrental.dto.SignInRequest;
+import com.nbm.carrental.dto.SignUpRequest;
 import com.nbm.carrental.entity.User;
-import com.nbm.carrental.repository.UserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.nbm.carrental.exception.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-@Service
-public class UserService {
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
-    private UserRepository userRepository;
-    private BCryptPasswordEncoder passwordEncoder;
+public interface UserService {
+    void addRoleToUser(String email, String roleName) throws UserNotFoundException, RoleNotFoundException, RoleAlreadyExistingException;
+    JwtAuthenticationResponse registerUser(SignUpRequest userRequest) throws UserAlreadyExistingException, AgencyAlreadyExistException;
+    JwtAuthenticationResponse authenticateUser(SignInRequest signInRequest) throws InvalidEmailOrPassword, UserNotEnabledException;
+    JwtAuthenticationResponse registerAgency(AgencySignupRequest agencySignupRequest) throws SomethingWentWrongException, ExistedAgencyException;
+//    Optional<User> findByEmail(String email);
 
-    public UserService(UserRepository userRepository,
-                       BCryptPasswordEncoder passwordEncoder){
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    List<User> allUsers();
 
-    public User registerUser(User user) {
-        user.setRole("USER");
-        String encryptedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encryptedPassword);
-        return userRepository.save(user);
-    }
+    void saveUserVerificationToken(User theUser, String verificationToken);
 
-    public User registerAgency(User user) {
-        user.setRole("AGENCY");
-        String encryptedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encryptedPassword);
-        return userRepository.save(user);
-    }
+    User validateVerificationToken(String token) throws TokenException;
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
+    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+    Optional<User> getUser(String tokenHeader);
+
+    Optional<User> getUserByEmail(String email);
 
 }
