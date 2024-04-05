@@ -6,6 +6,7 @@ import com.nbm.carrental.dto.SignInRequest;
 import com.nbm.carrental.dto.SignUpRequest;
 import com.nbm.carrental.entity.AppRole;
 import com.nbm.carrental.entity.User;
+import com.nbm.carrental.exception.RoleAlreadyExistingException;
 import com.nbm.carrental.exception.SomethingWentWrongException;
 import com.nbm.carrental.exception.UserAlreadyExistingException;
 import com.nbm.carrental.repository.UserRepository;
@@ -30,9 +31,14 @@ public class CarRentalApplication {
     @Bean
     CommandLineRunner start(UserService userService, RoleService roleService, UserRepository userRepository) {
         return args -> {
-             roleService.addNewRole(new AppRole(null, "USER"));
-             roleService.addNewRole(new AppRole(null, "ADMIN"));
-             roleService.addNewRole(new AppRole(null, "AGENCY"));
+
+            try {
+                roleService.addNewRole(new AppRole(null, "USER"));
+                roleService.addNewRole(new AppRole(null, "ADMIN"));
+                roleService.addNewRole(new AppRole(null, "AGENCY"));
+            }catch (RoleAlreadyExistingException e){
+                e.printStackTrace();
+            }
              LocalDateTime now = LocalDateTime.now();
 
             try {
