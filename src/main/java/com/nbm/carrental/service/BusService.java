@@ -12,6 +12,8 @@ import com.nbm.carrental.repository.AgencyRepository;
 import com.nbm.carrental.repository.BusRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,9 +29,9 @@ public class BusService implements IBusService {
     private final AgencyRepository agencyRepository;
 
     @Override
-    public List<Bus> findAllBuses() {
-        List<Bus> buses = busRepository.findAll();
-        return buses;
+    public List<Bus> findAllBuses(Pageable pageable) {
+        Page<Bus> buses = busRepository.findAll(pageable);
+        return buses.getContent();
     }
 
     @Override
@@ -58,7 +60,7 @@ public class BusService implements IBusService {
     }
 
     @Override
-    public List<Bus> findAllBusesForAuthenticatedUser(HttpServletRequest request) throws UserNotFoundException {
+    public List<Bus> findAllBusesForAuthenticatedUser(HttpServletRequest request, Pageable pageable) throws UserNotFoundException {
         String userEmail = (String) request.getAttribute(JwtAuthenticationFilter.USER_EMAIL_ATTRIBUTE);
         Optional<User> userOptional = userService.getUserByEmail(userEmail);
 
@@ -67,7 +69,8 @@ public class BusService implements IBusService {
         }
 
         User user = userOptional.get();
-        return busRepository.findByAgencyUser(user);
+        Page<Bus> buses = busRepository.findByAgencyUser(user, pageable);
+        return buses.getContent();
     }
 
     @Override

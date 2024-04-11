@@ -5,16 +5,17 @@ import com.nbm.carrental.entity.Bus;
 import com.nbm.carrental.exception.AgencyNotFoundException;
 import com.nbm.carrental.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface IBusService {
-    List<Bus> findAllBuses();
+    List<Bus> findAllBuses(Pageable pageable);
 
     Bus createBus(BusDto busDto, HttpServletRequest request) throws UserNotFoundException, AgencyNotFoundException;
 
-    List<Bus> findAllBusesForAuthenticatedUser(HttpServletRequest request) throws UserNotFoundException;
+    List<Bus> findAllBusesForAuthenticatedUser(HttpServletRequest request, Pageable pageable) throws UserNotFoundException;
 
     Optional<Bus> getBusById(Long id);
 

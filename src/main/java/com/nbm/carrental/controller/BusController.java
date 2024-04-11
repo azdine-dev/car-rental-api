@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -30,15 +32,19 @@ public class BusController {
 
     @PreAuthorize("hasAuthority('ADMIN')") // Allow users with ADMIN  role
     @RequestMapping(method = RequestMethod.GET, value = "/")
-    public ResponseEntity<List<Bus>> getAllBuses() {
-        List<Bus> buses = busService.findAllBuses();
+    public ResponseEntity<List<Bus>> getAllBuses( @RequestParam(defaultValue = "0") Integer pageNo,
+                                                  @RequestParam(defaultValue = "10") Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        List<Bus> buses = busService.findAllBuses(pageable);
         return ResponseEntity.ok(buses);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/user")
-    public ResponseEntity<List<Bus>> getAllBusesForAuthenticatedUser(HttpServletRequest request) {
+    public ResponseEntity<List<Bus>> getAllBusesForAuthenticatedUser(HttpServletRequest request, @RequestParam(defaultValue = "0") Integer pageNo,
+                                                                     @RequestParam(defaultValue = "10") Integer pageSize) {
         try {
-            List<Bus> buses = busService.findAllBusesForAuthenticatedUser(request);
+            Pageable pageable = PageRequest.of(pageNo, pageSize);
+            List<Bus> buses = busService.findAllBusesForAuthenticatedUser(request, pageable);
             return ResponseEntity.ok(buses);
         } catch (UserNotFoundException e) {
             // Handle UserNotFoundException
